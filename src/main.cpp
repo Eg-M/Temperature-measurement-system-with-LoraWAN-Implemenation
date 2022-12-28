@@ -9,6 +9,7 @@
 #include <DallasTemperature.h>
 #include <MKRWAN.h>
 #include <CayenneLPP.h>
+#include <Adafruit_SleepyDog.h>
 
 // Data wire is plugged into port 4 on the Arduino
 #define ONE_WIRE_BUS 4
@@ -104,50 +105,57 @@ void setup() {
   // this is enforced by firmware and can not be changed.
 }
 
-void loop() {
+void loop()
+{
 
-  sensors.requestTemperatures(); // Send the command to get temperatures
- 
-  int err;
+  if (!(millis() % 60000))
+  {
+
+    sensors.requestTemperatures(); // Send the command to get temperatures
+
+    
+
+    lpp.reset();
+    lpp.addTemperature(1, sensors.getTempC(insideThermometer));
+    lpp.addTemperature(2, sensors.getTempC(outsideThermometer));
+    modem.beginPacket();
+    modem.write(lpp.getBuffer(), lpp.getSize());
+    if (modem.endPacket(true) > 0)
+    {
+      Serial.println("Message sent correctly!");
+    }
+    else
+    {
+      Serial.println("Error sending message :(");
+      Serial.println("(you may send a limited amount of messages per minute, depending on the signal strength");
+      Serial.println("it may vary from 1 message every couple of seconds to 1 message every minute)");
+    }
+    //delay(1000);
+    if (!modem.available())
+    {
+      Serial.println("No downlink message received at this time.");
+    }
+    else
+    {
+      String rcv;
+      rcv.reserve(64);
+      while (modem.available())
+      {
+        rcv += (char)modem.read();
+      }
+      Serial.print("Received: " + rcv + " - ");
+      for (unsigned int i = 0; i < rcv.length(); i++)
+      {
+        Serial.print(rcv[i] >> 4, HEX);
+        Serial.print(rcv[i] & 0xF, HEX);
+        Serial.print(" ");
+      }
+      Serial.println();
+    }
+    Serial.println("waiting 60 seconds");
   
-  lpp.reset();
-  lpp.addTemperature(1, sensors.getTempC(insideThermometer));
-  lpp.addTemperature(2,sensors.getTempC(outsideThermometer));
-  modem.beginPacket();
-  modem.write(lpp.getBuffer(), lpp.getSize());
-  err = modem.endPacket(true);
-  if (err > 0) {
-    Serial.println("Message sent correctly!");
-  } else {
-    Serial.println("Error sending message :(");
-    Serial.println("(you may send a limited amount of messages per minute, depending on the signal strength");
-    Serial.println("it may vary from 1 message every couple of seconds to 1 message every minute)");
   }
-  delay(1000);
-  if (!modem.available()) {
-    Serial.println("No downlink message received at this time.");
-  }
-  else {
-    String rcv;
-    rcv.reserve(64);
-    while (modem.available()) {
-      rcv += (char)modem.read();
-    }
-    Serial.print("Received: " + rcv + " - ");
-    for (unsigned int i = 0; i < rcv.length(); i++) {
-      Serial.print(rcv[i] >> 4, HEX);
-      Serial.print(rcv[i] & 0xF, HEX);
-      Serial.print(" ");
-    }
-    Serial.println();
-  }
-  Serial.println("waiting 60 seconds");
-  for (int i=1; i<=60; i++) { //wait a minute
-    Serial.println(i);
-    delay(1000); 
-  }  
 }
-
 
 void printTemperature(DeviceAddress deviceAddress)
 {
