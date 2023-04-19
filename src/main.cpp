@@ -14,7 +14,7 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress insideThermometer, outsideThermometer;
 
 // Analog pin settings
-const int analogPin = A0;
+const int analogPin = A1;
 float analogValue;
 
 // LoRaWAN and CayenneLPP
@@ -39,7 +39,8 @@ void setup() {
 
 
   Serial.begin(115200);
-  
+  analogReference(AR_DEFAULT);
+
   LowPower.attachInterruptWakeup(RTC_ALARM_WAKEUP, alarmEvent, CHANGE);
 
 
@@ -99,12 +100,14 @@ void sendData() {
   sensors.requestTemperatures();
   float temp1 = sensors.getTempC(insideThermometer);
   float temp2 = sensors.getTempC(outsideThermometer);
-  analogValue = analogRead(analogPin);
+  analogValue = analogRead(analogPin) * 3.3f / 1023.0f / 1.03f * (1.03f+0.325f);; 
+
+
 
   lpp.reset();
   lpp.addTemperature(1, temp1);
   lpp.addTemperature(2, temp2);
-  lpp.addAnalogInput(3, 3.31f); 
+  lpp.addAnalogInput(3, analogValue); 
 
 
 //Debug buffer 
