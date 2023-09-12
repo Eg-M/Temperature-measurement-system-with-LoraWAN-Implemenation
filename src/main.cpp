@@ -37,7 +37,8 @@ void reboot();
 void setup() {
 
 
-
+  //initialize peripherals 
+  //USBDevice.attach(); // Use it for debugging
   Serial.begin(115200);
   analogReference(AR_DEFAULT);
 
@@ -50,9 +51,11 @@ void setup() {
   if (!sensors.getAddress(outsideThermometer, 1))
   Serial.println("Unable to find address for Device 1");
 
-
   // Initialize sensors
   sensors.begin();
+
+  
+  
   // set the resolution to 12 bit (Each Dallas/Maxim device is capable of several different resolutions)
   sensors.setResolution(insideThermometer, 12);
   sensors.setResolution(outsideThermometer, 12);
@@ -73,7 +76,10 @@ void setup() {
     if (!connected)
     {
       Serial.println("Something went wrong; are you indoor? Move near a window and retry");
-      reboot();
+      Serial.end();
+      // USBDevice.detach(); //maybe to improve power consumption 
+      // goToSleep();
+      // reboot();
     }
     else {
       Serial.println("Connected to the network");
