@@ -73,9 +73,7 @@ void setup() {
     if (!connected)
     {
       Serial.println("Something went wrong; are you indoor? Move near a window and retry");
-      while (1)
-      {
-      }
+      reboot();
     }
     else {
       Serial.println("Connected to the network");
