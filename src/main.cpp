@@ -41,6 +41,7 @@ void setup() {
   //USBDevice.attach(); // Use it for debugging
   Serial.begin(115200);
   analogReference(AR_DEFAULT);
+  analogReadResolution(12);
 
   LowPower.attachInterruptWakeup(RTC_ALARM_WAKEUP, alarmEvent, CHANGE);
 
@@ -104,8 +105,8 @@ void sendData() {
   sensors.requestTemperatures();
   float temp1 = sensors.getTempC(insideThermometer);
   float temp2 = sensors.getTempC(outsideThermometer);
-  analogValue = analogRead(analogPin) * 3.3f / 1023.0f / 1.03f * (1.03f+0.325f);; 
-
+  //analogValue = analogRead(analogPin) * 3.313f / 4098.0f / 1.2f * (1.2f+0.33f); 
+  analogValue = float(analogRead(analogPin)) * 0.00103232064f;
 
 
   lpp.reset();
