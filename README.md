@@ -16,6 +16,7 @@ OneWire.h (for communication with temperature sensor)
 DallasTemperature.h (for interfacing with Dallas temperature sensors)
 ArduinoLowPower.h (for power management)
 arduino_secrets.h (for storing sensitive data like keys)
+```
 
 ## Configuration
 
