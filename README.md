@@ -1,32 +1,30 @@
-# Temperature Measurement System with LoRaWAN Implementation
+# Temperature Measurement System
 
-## Overview
-This project is a temperature measurement system using LoRaWAN for remote data transmission. It's ideal for monitoring in distant locations, taking advantage of LoRaWAN's long-range communication.
+Arduino firmware for reading two DS18B20 temperature sensors with an Arduino MKR WAN 1310. It reports the sensor readings over the serial connection.
 
-## Hardware Requirements
-- MKR WAN 1300 or compatible LoRaWAN board
-- DS18B20 or similar temperature sensor
-- Basic wiring and power supply components
+> **Current scope:** Despite the repository name, the current firmware does not implement LoRaWAN transmission. It reads the sensors and writes their temperatures to serial.
 
-## Software Dependencies
-- MKRWAN.h (for LoRaWAN connectivity)
-- CayenneLPP.h (for payload formatting)
-- OneWire.h (for communication with temperature sensor)
-- DallasTemperature.h (for interfacing with Dallas temperature sensors)
-- ArduinoLowPower.h (for power management)
-- arduino_secrets.h (for storing sensitive data like keys)
+## Hardware
 
-## Configuration
-- Update arduino_secrets.h with your LoRaWAN keys and credentials.
-- Ensure proper wiring between the temperature sensor and the MKR WAN board.
+- Arduino MKR WAN 1310
+- Two DS18B20 temperature sensors
+- A 4.7 kΩ pull-up resistor between the OneWire data line and 3.3 V
 
-## Usage
-- The system reads temperature data from the sensor.
-- Data is formatted using CayenneLPP.
-- LoRaWAN is used to transmit data to a configured network.
-- Low power features are employed for energy efficiency in remote deployments.
+Connect both sensors to the same OneWire bus:
 
-## Extending the Project
-- Integrate additional sensors for more environmental data.
-- Enhance power management for longer deployment life.
-- Implement data analysis tools for the received data.
+| DS18B20 | MKR WAN 1310 |
+| --- | --- |
+| VDD | 3.3 V |
+| GND | GND |
+| DATA | D4 |
+
+Use the same shared DATA line for both sensors and connect the pull-up resistor between DATA and 3.3 V. Check the sensor pinout before wiring.
+
+## Build and upload
+
+This is a PlatformIO project targeting the MKR WAN 1310. Install PlatformIO Core or the PlatformIO IDE, connect the board, then run these commands from the project directory:
+
+```sh
+pio run
+pio run --target upload
+pio device monitor --baud 9600
